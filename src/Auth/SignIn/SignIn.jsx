@@ -25,7 +25,6 @@ function SignIn() {
       const successsMsg = res.data?.message || "SignIn success";
       console.log(successsMsg);
 
-      // navigate("/taskmanagement");
       navigate("/select-role");
 
       setEmail("");
@@ -53,7 +52,7 @@ function SignIn() {
       <div className="lg:w-1/2 flex items-center justify-center lg:justify-between">
         <img src="/Login.jpg" alt="role" className="w-[70%] lg:w-[90%] lg:h-[99.9vh]" />
       </div>
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center -mt-20 lg:mt-0">
         <h1 className="text-2xl font-bold">Welcome Back</h1>
         <p className="text-sm">Login in to manage your task and track progress.</p>
 

@@ -252,7 +252,7 @@ const AllTasks = () => {
                           setSelectedTask(task);
                           setIsEditing(false);
                         }}
-                        className="px-1 lg:px-3 lg:py-1 py-0.5 bg-indigo-600 text-white rounded mr-1"
+                        className="px-1 lg:px-3 lg:py-1 py-0.5 bg-indigo-600 text-white rounded mr-1 cursor-pointer"
                       >
                         View
                       </button>
@@ -267,7 +267,7 @@ const AllTasks = () => {
                               status: task.status,
                             });
                           }}
-                          className="px-1.5 lg:px-3 py-1 bg-green-600 text-white rounded"
+                          className="px-1.5 lg:px-3 py-1 bg-green-600 text-white rounded cursor-pointer"
                         >
                           Edit
                         </button>

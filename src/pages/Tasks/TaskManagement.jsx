@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../Api/api";
 import { FaTasks } from "react-icons/fa";
 import { IoAddCircleOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 /* ===============================
    DASHBOARD COMPONENT
@@ -121,8 +122,9 @@ function TaskManagement() {
             Quick Actions
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div
-              className="bg-white p-5 rounded-xl shadow flex items-center gap-4 cursor-pointer"
+            <Link
+              to="/alltasks"
+              className="bg-white p-2.5 lg:p-5 rounded-xl shadow flex items-center gap-4 cursor-pointer"
               onClick={() => setShowCreatePanel(false)}
             >
               <FaTasks size={22} />
@@ -132,10 +134,10 @@ function TaskManagement() {
                   View and manage all tasks
                 </p>
               </div>
-            </div>
+            </Link>
 
             <button
-              className="bg-white p-5 rounded-xl shadow flex items-center gap-4"
+              className="bg-white p-2.5 lg:p-5 rounded-xl shadow flex items-center gap-4 cursor-pointer"
               onClick={() => setShowCreatePanel(true)}
             >
               <IoAddCircleOutline size={22} />
@@ -159,7 +161,7 @@ function TaskManagement() {
       {/* ===============================
           CREATE TASK PANEL (RIGHT SIDE)
       ================================ */}
-      
+
       {showCreatePanel && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white p-6 rounded-xl w-[80vw] lg:w-[25vw] shadow relative">
@@ -235,10 +237,10 @@ export default TaskManagement;
 ================================ */
 function StatCard({ title, value, color }) {
   return (
-    <div className="bg-white p-5 rounded-xl shadow">
-      <p className="text-gray-500 text-sm">{title}</p>
-      <h2 className="text-3xl font-bold mt-2">{value}</h2>
-      <div className={`h-2 mt-4 rounded ${color}`} />
+    <div className="bg-white p-2 lg:p-5 rounded-xl shadow">
+      <p className="text-gray-500 text-[13px] lg:text-sm">{title}</p>
+      <h2 className="text-xl lg:text-3xl font-bold lg:mt-2">{value}</h2>
+      <div className={`h-2 mt-2 lg:mt-4 rounded ${color}`} />
     </div>
   );
 }
@@ -289,15 +291,15 @@ function UserTaskTable() {
     <div className="flex gap-6">
       {/* TASK TABLE */}
       <div className="flex-1 bg-white rounded-xl shadow overflow-x-auto">
-        <table className="w-full text-sm min-w-[600px]">
+        <table className="w-full text-sm min-w-[70vw]">
           <thead className="bg-gray-100">
             <tr>
-              <th className="p-3 text-left">Task ID</th>
-              <th className="p-3 text-left">Title</th>
-              <th className="p-3 text-center">Assigned By</th>
-              <th className="p-3 text-center">Status</th>
-              <th className="p-3 text-center">Created On</th>
-              <th className="p-3 text-center">Action</th>
+              <th className="hidden lg:inline lg:p-3 text-left">Task ID</th>
+              <th className="lg:p-3 text-left">Title</th>
+              <th className="lg:p-3 text-center">Assigned By</th>
+              <th className="lg:p-3 text-center">Status</th>
+              <th className="lg:p-3 text-center">Created On</th>
+              <th className="lg:p-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -310,7 +312,9 @@ function UserTaskTable() {
             ) : (
               tasks.map((task) => (
                 <tr key={task._id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 font-semibold">{getTaskCode(task._id)}</td>
+                  <td className="hidden lg:inline lg:p-3 font-semibold">
+                    {getTaskCode(task._id)}
+                  </td>
                   <td className="p-3">{task.title}</td>
                   <td className="p-3 text-center">
                     {task.createdBy?.fullName || "-"}
@@ -340,50 +344,57 @@ function UserTaskTable() {
 
       {/* EDIT PANEL */}
       {selectedTask && isEditing && (
-        <div className="relative w-[360px] bg-white rounded-xl shadow p-4">
-          <button
-            onClick={() => {
-              setSelectedTask(null);
-              setIsEditing(false);
-            }}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold"
-          >
-            ✕
-          </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          {/* Modal Card */}
+          <div className="relative w-[360px] bg-white rounded-xl shadow-lg p-4 animate-fadeIn">
+            <button
+              onClick={() => {
+                setSelectedTask(null);
+                setIsEditing(false);
+              }}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold"
+            >
+              ✕
+            </button>
 
-          <h3 className="font-semibold mb-2">{selectedTask.title}</h3>
-          <p className="text-sm text-gray-600 mb-3">
-            {selectedTask.description || "No description"}
-          </p>
+            <h3 className="mb-2 flex gap-1">
+              <span className="font-semibold">Title:</span>
+              <span>{selectedTask.title}</span>
+            </h3>
 
-          <label className="block mb-2 font-semibold">Update Status</label>
-          <select
-            className="w-full border p-2 rounded mb-3"
-            value={editData.status}
-            onChange={(e) =>
-              setEditData({ ...editData, status: e.target.value })
-            }
-          >
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-          </select>
+            <p className="text-sm text-gray-600 mb-3">
+              {selectedTask.description || "No description"}
+            </p>
 
-          <button
-            onClick={handleUpdate}
-            className="w-full bg-green-600 text-white py-2 rounded"
-          >
-            Save Status
-          </button>
+            <label className="block mb-2 font-semibold">Update Status</label>
+            <select
+              className="w-full border p-2 rounded mb-3"
+              value={editData.status}
+              onChange={(e) =>
+                setEditData({ ...editData, status: e.target.value })
+              }
+            >
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+            </select>
 
-          <button
-            onClick={() => {
-              setIsEditing(false);
-              setSelectedTask(null);
-            }}
-            className="w-full border py-2 rounded mt-2"
-          >
-            Cancel
-          </button>
+            <button
+              onClick={handleUpdate}
+              className="w-full bg-green-600 text-white py-2 rounded"
+            >
+              Save Status
+            </button>
+
+            <button
+              onClick={() => {
+                setIsEditing(false);
+                setSelectedTask(null);
+              }}
+              className="w-full border py-2 rounded mt-2"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
     </div>

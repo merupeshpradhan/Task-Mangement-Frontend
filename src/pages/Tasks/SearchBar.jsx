@@ -10,7 +10,7 @@ function SearchBar() {
   };
 
   return (
-    <div>
+    <div className="hidden lg:inline">
       <div className="border border-[#85ac85] flex items-center rounded-lg lg:rounded-full ml-1 lg:ml-0">
         <div className="lg:pl-2 pl-1 text-gray-400 mt-0.5">
           <FaSearch className="size-3" />
