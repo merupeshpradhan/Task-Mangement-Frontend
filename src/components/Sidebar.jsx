@@ -36,7 +36,7 @@ function Sidebar() {
   }
 };
   return (
-    <div className="w-[20vw] h-screen fixed left-0 top-0 bg-white border-r flex flex-col justify-between">
+    <div className="hidden w-[20vw] h-screen fixed left-0 top-0 bg-white border-r lg:flex flex-col justify-between">
       {/* TOP */}
       <div>
         <h1 className="mt-4 ml-4 font-bold text-lg">

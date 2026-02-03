@@ -91,7 +91,7 @@ function TaskManagement() {
   };
 
   return (
-    <div className="p-6">
+    <div className="lg:p-6">
       <h2 className="text-xl font-semibold mb-6">Dashboard</h2>
 
       {/* ===== STATS ===== */}
@@ -159,19 +159,14 @@ function TaskManagement() {
       {/* ===============================
           CREATE TASK PANEL (RIGHT SIDE)
       ================================ */}
+      
       {showCreatePanel && (
-        <div className="fixed inset-0 z-50 flex">
-          {/* Background overlay */}
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setShowCreatePanel(false)}
-          />
-
-          {/* Right side panel */}
-          <div className="ml-auto w-[400px] bg-white h-full p-6 shadow-xl overflow-y-auto relative">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white p-6 rounded-xl w-[80vw] lg:w-[25vw] shadow relative">
+            {/* CLOSE BUTTON */}
             <button
               onClick={() => setShowCreatePanel(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold"
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold cursor-pointer"
             >
               ✕
             </button>
@@ -187,11 +182,10 @@ function TaskManagement() {
                 setNewTask({ ...newTask, title: e.target.value })
               }
             />
-
             <textarea
               placeholder="Description"
               className="w-full border p-2 rounded mb-2"
-              rows={3}
+              rows="3"
               value={newTask.description}
               onChange={(e) =>
                 setNewTask({ ...newTask, description: e.target.value })
@@ -213,19 +207,20 @@ function TaskManagement() {
               ))}
             </select>
 
-            <button
-              onClick={handleCreateTask}
-              className="w-full bg-blue-600 text-white py-2 rounded mb-2"
-            >
-              Create Task
-            </button>
-
-            <button
-              onClick={() => setShowCreatePanel(false)}
-              className="w-full border py-2 rounded"
-            >
-              Cancel
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleCreateTask}
+                className="flex-1 bg-blue-600 text-white py-2 rounded"
+              >
+                Create
+              </button>
+              <button
+                onClick={() => setShowCreate(false)}
+                className="flex-1 border py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

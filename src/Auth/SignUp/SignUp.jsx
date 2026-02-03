@@ -51,15 +51,24 @@ function SignUp() {
   };
 
   return (
-    <div className="h-[99.9vh] flex items-center justify-around">
-      <div className="w-1/2 flex items-center justify-between">
-        <img src="/Login.jpg" alt="role" className="w-[90%] h-[99.9vh]" />
+    <div className="h-[99.9vh] flex flex-col lg:flex-row items-center justify-around">
+      <div className="lg:w-1/2 flex items-center justify-center lg:justify-between">
+        <img
+          src="/Login.jpg"
+          alt="role"
+          className="w-[70%] lg:w-[90%] lg:h-[99.9vh]"
+        />
       </div>
       <div className="flex flex-col items-center">
         <h1 className="text-2xl font-bold">Welcome Back</h1>
-        <p>Login in to manage your task and track progress.</p>
+        <p className="text-sm">
+          Login in to manage your task and track progress.
+        </p>
 
-        <form onSubmit={userSignUp} className="w-[30vw] space-y-5 mt-10">
+        <form
+          onSubmit={userSignUp}
+          className="w-[80vw] lg:w-[30vw] space-y-5 mt-7 lg:mt-10"
+        >
           {/* FullName */}
           <div className="firstName w-full">
             <label className="md:font-semibold text-gray-700">First Name</label>

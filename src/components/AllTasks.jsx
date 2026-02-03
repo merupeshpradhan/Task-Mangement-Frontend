@@ -107,7 +107,7 @@ const AllTasks = () => {
       const updatedTask = res.data.data;
 
       setTasks((prev) =>
-        prev.map((t) => (t._id === updatedTask._id ? updatedTask : t))
+        prev.map((t) => (t._id === updatedTask._id ? updatedTask : t)),
       );
 
       setIsEditing(false);
@@ -149,7 +149,12 @@ const AllTasks = () => {
 
       setTasks((prev) => [createdTask, ...prev]);
       setShowCreate(false);
-      setNewTask({ title: "", description: "", assignedTo: "", status: "pending" });
+      setNewTask({
+        title: "",
+        description: "",
+        assignedTo: "",
+        status: "pending",
+      });
     } catch (err) {
       console.error("Create task failed:", err);
       alert("Failed to create task");
@@ -159,19 +164,19 @@ const AllTasks = () => {
   if (loading) return <p className="p-6">Loading...</p>;
 
   return (
-    <div className="p-6">
+    <div className="lg:p-6">
       {/* TOP BAR: FILTERS + CREATE BUTTON */}
       <div className="flex justify-between items-center mb-4">
         {/* FILTER BUTTONS */}
-        <div className="flex gap-2">
+        <div className="flex gap-1 lg:gap-2">
           {["all", "pending", "in-progress", "completed"].map((status) => (
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
               className={`px-4 py-1 rounded ${
                 filterStatus === status
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-200 text-gray-700"
+                  ? "bg-indigo-600 text-white text-[10px] lg:text-base"
+                  : "bg-gray-200 text-gray-700 text-[10px] lg:text-base"
               }`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -183,9 +188,10 @@ const AllTasks = () => {
         {isAdmin && (
           <button
             onClick={() => setShowCreate(true)}
-            className="px-4 py-1 bg-blue-600 text-white rounded"
+            className="px-4 py-1 bg-blue-600 text-white rounded text-[10px] lg:text-base ml-5 lg:ml-0 cursor-pointer"
           >
-            + Create Task
+            <span className="inline lg:hidden">Create Task</span>
+            <span className="hidden lg:inline">+ Create Task</span>
           </button>
         )}
       </div>
@@ -193,16 +199,18 @@ const AllTasks = () => {
       {/* TASK TABLE + RIGHT PANEL */}
       <div className="flex gap-6">
         {/* TASK TABLE */}
-        <div className="flex-1 bg-white rounded-xl shadow overflow-x-auto">
-          <table className="w-full text-sm min-w-[600px]">
+        <div className="flex-1 bg-white rounded-xl shadow lg:overflow-x-auto">
+          <table className="w-full text-[10px] lg:text-sm lg:min-w-[600px]">
             <thead className="bg-gray-100">
               <tr>
-                <th className="p-3 text-left">Task ID</th>
-                <th className="p-3 text-left">Title</th>
-                <th className="p-3 text-center">Assigned To</th>
-                <th className="p-3 text-center">Status</th>
-                <th className="p-3 text-center">Created</th>
-                <th className="p-3 text-center">Action</th>
+                <th className="p-2 lg:p-3 text-left hidden lg:inline">
+                  Task ID
+                </th>
+                <th className="p-2 lg:p-3 text-left">Title</th>
+                <th className="p-2 lg:p-3 text-center">Assigned To</th>
+                <th className="p-2 lg:p-3 text-center">Status</th>
+                <th className="p-2 lg:p-3 text-center">Created</th>
+                <th className="p-2 lg:p-3 text-center">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -215,12 +223,16 @@ const AllTasks = () => {
               ) : (
                 filteredTasks.map((task) => (
                   <tr key={task._id} className="border-b hover:bg-gray-50">
-                    <td className="p-3 font-semibold">{getTaskCode(task._id)}</td>
-                    <td className="p-3">{task.title}</td>
-                    <td className="p-3 text-center">{task.assignedTo?.fullName || "-"}</td>
-                    <td className="p-3 text-center capitalize">
+                    <td className="p-2 font-semibold hidden lg:inline">
+                      {getTaskCode(task._id)}
+                    </td>
+                    <td className="p-2 lg:p-3">{task.title}</td>
+                    <td className="lg:p-3 text-center">
+                      {task.assignedTo?.fullName || "-"}
+                    </td>
+                    <td className="lg:p-3 text-center capitalize">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        className={`lg:px-3 px-1 lg:py-1 rounded-md lg:rounded-full text-xs font-semibold ${
                           task.status === "pending"
                             ? "bg-orange-100 text-orange-600"
                             : task.status === "in-progress"
@@ -231,14 +243,16 @@ const AllTasks = () => {
                         {task.status}
                       </span>
                     </td>
-                    <td className="p-3 text-center">{formatDate(task.createdAt)}</td>
-                    <td className="p-3 text-center">
+                    <td className="lg:p-3 text-center">
+                      {formatDate(task.createdAt)}
+                    </td>
+                    <td className="lg:p-3 text-center">
                       <button
                         onClick={() => {
                           setSelectedTask(task);
                           setIsEditing(false);
                         }}
-                        className="px-3 py-1 bg-indigo-600 text-white rounded mr-1"
+                        className="px-1 lg:px-3 lg:py-1 py-0.5 bg-indigo-600 text-white rounded mr-1"
                       >
                         View
                       </button>
@@ -253,7 +267,7 @@ const AllTasks = () => {
                               status: task.status,
                             });
                           }}
-                          className="px-3 py-1 bg-green-600 text-white rounded"
+                          className="px-1.5 lg:px-3 py-1 bg-green-600 text-white rounded"
                         >
                           Edit
                         </button>
@@ -268,98 +282,104 @@ const AllTasks = () => {
 
         {/* RIGHT PANEL */}
         {selectedTask && (
-          <div className="w-[360px] bg-white rounded-xl shadow p-4 relative">
-            {/* CLOSE BUTTON */}
-            <button
-              onClick={() => {
-                setSelectedTask(null);
-                setIsEditing(false);
-              }}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold"
-            >
-              ✕
-            </button>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            {/* MODAL */}
+            <div className="w-[360px] bg-white rounded-xl shadow-xl p-4 relative">
+              {/* CLOSE BUTTON */}
+              <button
+                onClick={() => {
+                  setSelectedTask(null);
+                  setIsEditing(false);
+                }}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold"
+              >
+                ✕
+              </button>
 
-            <h3 className="font-semibold mb-2">{selectedTask.title}</h3>
+              <h3 className="font-semibold mb-2">Title: {selectedTask.title}</h3>
 
-            {isEditing ? (
-              <>
-                {isAdmin && (
-                  <>
-                    <input
-                      className="w-full border p-2 rounded mb-2"
-                      value={editData.title}
+              {isEditing ? (
+                <>
+                  {isAdmin && (
+                    <>
+                      <input
+                        className="w-full border p-2 rounded mb-2"
+                        value={editData.title}
+                        onChange={(e) =>
+                          setEditData({ ...editData, title: e.target.value })
+                        }
+                      />
+                      <textarea
+                        className="w-full border p-2 rounded mb-2"
+                        rows="3"
+                        value={editData.description}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            description: e.target.value,
+                          })
+                        }
+                      />
+                    </>
+                  )}
+
+                  {(isAdmin || selectedTask.assignedTo?._id === user._id) && (
+                    <select
+                      className="w-full border p-2 rounded mb-3"
+                      value={editData.status}
                       onChange={(e) =>
-                        setEditData({ ...editData, title: e.target.value })
+                        setEditData({ ...editData, status: e.target.value })
                       }
-                    />
-                    <textarea
-                      className="w-full border p-2 rounded mb-2"
-                      rows="3"
-                      value={editData.description}
-                      onChange={(e) =>
-                        setEditData({ ...editData, description: e.target.value })
-                      }
-                    />
-                  </>
-                )}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="completed">Completed</option>
+                    </select>
+                  )}
 
-                {(isAdmin || selectedTask.assignedTo?._id === user._id) && (
-                  <select
-                    className="w-full border p-2 rounded mb-3"
-                    value={editData.status}
-                    onChange={(e) =>
-                      setEditData({ ...editData, status: e.target.value })
-                    }
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="completed">Completed</option>
-                  </select>
-                )}
-
-                <button
-                  onClick={handleUpdate}
-                  className="w-full bg-green-600 text-white py-2 rounded"
-                >
-                  Save Changes
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="text-sm text-gray-600 mb-3">
-                  {selectedTask.description || "No description"}
-                </p>
-
-                <p className="text-sm mb-2 capitalize">
-                  <b>Status:</b> {selectedTask.status}
-                </p>
-
-                {(isAdmin || selectedTask.assignedTo?._id === user._id) && (
                   <button
-                    onClick={() => {
-                      setIsEditing(true);
-                      setEditData({
-                        title: selectedTask.title,
-                        description: selectedTask.description || "",
-                        status: selectedTask.status,
-                      });
-                    }}
-                    className="w-full border py-2 rounded mt-3"
+                    onClick={handleUpdate}
+                    className="w-full bg-green-600 text-white py-2 rounded"
                   >
-                    Edit
+                    Save Changes
                   </button>
-                )}
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-600 mb-3">
+                     <b className="text-black">Description:</b> {selectedTask.description || "No description"}
+                  </p>
 
-                {isAdmin && (
-                  <button
-                    onClick={() => handleDelete(selectedTask._id)}
-                    className="w-full bg-red-600 text-white py-2 rounded mt-2"
-                  >
-                    Delete
-                  </button>
-                )}
-              </>
-            )}
+                  <p className="text-sm mb-2 capitalize">
+                    <b>Status:</b> {selectedTask.status}
+                  </p>
+
+                  {(isAdmin || selectedTask.assignedTo?._id === user._id) && (
+                    <button
+                      onClick={() => {
+                        setIsEditing(true);
+                        setEditData({
+                          title: selectedTask.title,
+                          description: selectedTask.description || "",
+                          status: selectedTask.status,
+                        });
+                      }}
+                      className="w-full border py-2 rounded mt-3"
+                    >
+                      Edit
+                    </button>
+                  )}
+
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(selectedTask._id)}
+                      className="w-full bg-red-600 text-white py-2 rounded mt-2"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -367,11 +387,11 @@ const AllTasks = () => {
       {/* CREATE TASK MODAL */}
       {showCreate && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white p-6 rounded-xl w-[400px] shadow relative">
+          <div className="bg-white p-6 rounded-xl w-[80vw] lg:w-[25vw] shadow relative">
             {/* CLOSE BUTTON */}
             <button
               onClick={() => setShowCreate(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold"
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold cursor-pointer"
             >
               ✕
             </button>

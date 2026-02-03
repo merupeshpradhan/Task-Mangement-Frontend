@@ -7,9 +7,9 @@ function DashboardLayout() {
     <div className="flex">
       <Sidebar />
 
-      <div className="ml-[20vw] w-[80vw] min-h-screen bg-gray-100">
+      <div className="w-full lg:ml-[20vw] min-h-screen bg-gray-100">
         <Navbar />
-        <div className="p-6">
+        <div className="p-3 lg:p-6">
           <Outlet />
         </div>
       </div>
