@@ -25,7 +25,8 @@ function SignIn() {
       const successsMsg = res.data?.message || "SignIn success";
       console.log(successsMsg);
 
-      navigate("/taskmanagement");
+      // navigate("/taskmanagement");
+      navigate("/select-role");
 
       setEmail("");
       setPassword("");
@@ -34,7 +35,7 @@ function SignIn() {
         const errorMsg =
           error.response?.data?.message ||
           "SignIn failed. Something went wrong.";
-          alert(errorMsg)
+        alert(errorMsg);
 
         console.log(errorMsg);
       } else {
@@ -49,14 +50,14 @@ function SignIn() {
 
   return (
     <div className="h-[99.9vh] flex items-center justify-around">
-      <div className="w-[40%]">
-        <img src="/Login.jpg" />
+      <div className="w-1/2 flex items-center justify-between">
+        <img src="/Login.jpg" alt="role" className="w-[90%] h-[99.9vh]" />
       </div>
       <div className="flex flex-col items-center">
         <h1 className="text-2xl font-bold">Welcome Back</h1>
         <p>Login in to manage your task and track progress.</p>
 
-        <form onSubmit={userSignIn} className="space-y-5 mt-10">
+        <form onSubmit={userSignIn} className="w-[30vw] space-y-5 mt-10">
           {/* Email */}
           <div>
             <label className="font-semibold text-gray-700">Email</label>
