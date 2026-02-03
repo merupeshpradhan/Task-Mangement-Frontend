@@ -3,6 +3,7 @@ import api from "../../Api/api";
 import { FaTasks } from "react-icons/fa";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import UserTaskTable from "./UserTaskTable";
 
 /* ===============================
    DASHBOARD COMPONENT
@@ -14,7 +15,6 @@ function TaskManagement() {
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
-    inProgress: 0,
     completed: 0,
   });
 
@@ -25,69 +25,62 @@ function TaskManagement() {
     assignedTo: "",
     status: "pending",
   });
+
   const [users, setUsers] = useState([]);
 
   /* ===============================
      FETCH STATS
   ================================ */
+  const fetchStats = async () => {
+    try {
+      const url = isAdmin ? "/tasks" : "/tasks/my-tasks";
+      const res = await api.get(url);
+      const tasks = res.data.data || [];
+
+      setStats({
+        total: tasks.length,
+        pending: tasks.filter(t => t.status === "pending").length,
+        completed: tasks.filter(t => t.status === "completed").length,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const url = isAdmin ? "/tasks" : "/tasks/my-tasks";
-        const res = await api.get(url);
-        const tasks = res.data.data;
-
-        setStats({
-          total: tasks.length,
-          pending: tasks.filter((t) => t.status === "pending").length,
-          inProgress: tasks.filter((t) => t.status === "in-progress").length,
-          completed: tasks.filter((t) => t.status === "completed").length,
-        });
-      } catch (err) {
-        console.error("Fetch stats error:", err);
-      }
-    };
-
     fetchStats();
   }, [isAdmin]);
 
   /* ===============================
-     FETCH USERS (for task assignment)
+     FETCH USERS (ADMIN)
   ================================ */
   useEffect(() => {
     if (!isAdmin) return;
-    const fetchUsers = async () => {
-      try {
-        const res = await api.get("/users");
-        setUsers(res.data.data || []);
-      } catch (err) {
-        console.error("Fetch users error:", err);
-      }
-    };
-    fetchUsers();
+    api.get("/users").then(res => {
+      setUsers(res.data.data || []);
+    });
   }, [isAdmin]);
 
   /* ===============================
-     HANDLE CREATE TASK
+     CREATE TASK
   ================================ */
   const handleCreateTask = async () => {
     if (!newTask.title || !newTask.assignedTo) {
-      return alert("Please fill title and select a user");
+      return alert("Title & Assigned user required");
     }
 
     try {
       await api.post("/tasks", newTask);
-      alert("Task created successfully!");
+      setShowCreatePanel(false);
       setNewTask({
         title: "",
         description: "",
         assignedTo: "",
         status: "pending",
       });
-      setShowCreatePanel(false);
+      fetchStats();
     } catch (err) {
-      console.error("Create task failed:", err);
-      alert("Failed to create task");
+      console.error(err);
     }
   };
 
@@ -95,134 +88,98 @@ function TaskManagement() {
     <div className="lg:p-6">
       <h2 className="text-xl font-semibold mb-6">Dashboard</h2>
 
-      {/* ===== STATS ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-        <StatCard title="My Tasks" value={stats.total} color="bg-blue-500" />
-        <StatCard
-          title="Pending Tasks"
-          value={stats.pending}
-          color="bg-orange-500"
-        />
-        <StatCard
-          title="In Progress"
-          value={stats.inProgress}
-          color="bg-purple-500"
-        />
-        <StatCard
-          title="Completed Tasks"
-          value={stats.completed}
-          color="bg-green-500"
-        />
+      {/* STATS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <StatCard title="Total Tasks" value={stats.total} color="bg-blue-500" />
+        <StatCard title="Pending" value={stats.pending} color="bg-orange-500" />
+        <StatCard title="Completed" value={stats.completed} color="bg-green-500" />
       </div>
 
-      {/* ===== ADMIN QUICK ACTIONS ===== */}
+      {/* ADMIN ACTIONS */}
       {isAdmin && (
-        <>
-          <h3 className="text-sm font-semibold text-gray-500 mb-4">
-            Quick Actions
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link
-              to="/alltasks"
-              className="bg-white p-2.5 lg:p-5 rounded-xl shadow flex items-center gap-4 cursor-pointer"
-              onClick={() => setShowCreatePanel(false)}
-            >
-              <FaTasks size={22} />
-              <div>
-                <h4 className="font-semibold">All Tasks</h4>
-                <p className="text-sm text-gray-500">
-                  View and manage all tasks
-                </p>
-              </div>
-            </Link>
+        <div className="grid md:grid-cols-2 gap-6 mb-10">
+          <Link
+            to="/alltasks"
+            className="bg-white p-5 rounded-xl shadow flex gap-4 items-center"
+          >
+            <FaTasks size={22} />
+            <div>
+              <h4 className="font-semibold">All Tasks</h4>
+              <p className="text-sm text-gray-500">Manage tasks</p>
+            </div>
+          </Link>
 
-            <button
-              className="bg-white p-2.5 lg:p-5 rounded-xl shadow flex items-center gap-4 cursor-pointer"
-              onClick={() => setShowCreatePanel(true)}
-            >
-              <IoAddCircleOutline size={22} />
-              <div>
-                <h4 className="font-semibold">Create Task</h4>
-                <p className="text-sm text-gray-500">Create and assign tasks</p>
-              </div>
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* ===== USER TASK VIEW ===== */}
-      {!isAdmin && (
-        <div className="mt-10">
-          <h3 className="font-semibold mb-4">My Tasks</h3>
-          <UserTaskTable />
+          <button
+            onClick={() => setShowCreatePanel(true)}
+            className="bg-white p-5 rounded-xl shadow flex gap-4 items-center"
+          >
+            <IoAddCircleOutline size={22} />
+            <div>
+              <h4 className="font-semibold">Create Task</h4>
+              <p className="text-sm text-gray-500">Assign new task</p>
+            </div>
+          </button>
         </div>
       )}
 
-      {/* ===============================
-          CREATE TASK PANEL (RIGHT SIDE)
-      ================================ */}
+      {/* USER TABLE */}
+      {!isAdmin && (
+        <UserTaskTable onTaskUpdated={fetchStats} />
+      )}
 
+      {/* CREATE MODAL */}
       {showCreatePanel && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white p-6 rounded-xl w-[80vw] lg:w-[25vw] shadow relative">
-            {/* CLOSE BUTTON */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white w-[360px] rounded-xl p-5 relative">
             <button
               onClick={() => setShowCreatePanel(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold cursor-pointer"
+              className="absolute top-3 right-3 text-lg"
             >
               ✕
             </button>
 
-            <h3 className="text-lg font-semibold mb-4">Create Task</h3>
+            <h3 className="font-semibold mb-4">Create Task</h3>
 
             <input
-              type="text"
+              className="w-full border p-2 mb-2 rounded"
               placeholder="Title"
-              className="w-full border p-2 rounded mb-2"
               value={newTask.title}
-              onChange={(e) =>
+              onChange={e =>
                 setNewTask({ ...newTask, title: e.target.value })
               }
             />
+
             <textarea
+              className="w-full border p-2 mb-2 rounded"
               placeholder="Description"
-              className="w-full border p-2 rounded mb-2"
               rows="3"
               value={newTask.description}
-              onChange={(e) =>
+              onChange={e =>
                 setNewTask({ ...newTask, description: e.target.value })
               }
             />
 
             <select
-              className="w-full border p-2 rounded mb-3"
+              className="w-full border p-2 mb-3 rounded"
               value={newTask.assignedTo}
-              onChange={(e) =>
+              onChange={e =>
                 setNewTask({ ...newTask, assignedTo: e.target.value })
               }
             >
               <option value="">Select User</option>
-              {users.map((u) => (
+              {users.map(u => (
                 <option key={u._id} value={u._id}>
                   {u.fullName}
                 </option>
               ))}
             </select>
 
-            <div className="flex gap-2">
-              <button
-                onClick={handleCreateTask}
-                className="flex-1 bg-blue-600 text-white py-2 rounded"
-              >
-                Create
-              </button>
-              <button
-                onClick={() => setShowCreate(false)}
-                className="flex-1 border py-2 rounded"
-              >
-                Cancel
-              </button>
-            </div>
+            <button
+              onClick={handleCreateTask}
+              className="w-full bg-blue-600 text-white py-2 rounded"
+            >
+              Create
+            </button>
           </div>
         </div>
       )}
@@ -233,170 +190,14 @@ function TaskManagement() {
 export default TaskManagement;
 
 /* ===============================
-   STAT CARD COMPONENT
+   STAT CARD
 ================================ */
 function StatCard({ title, value, color }) {
   return (
-    <div className="bg-white p-2 lg:p-5 rounded-xl shadow">
-      <p className="text-gray-500 text-[13px] lg:text-sm">{title}</p>
-      <h2 className="text-xl lg:text-3xl font-bold lg:mt-2">{value}</h2>
-      <div className={`h-2 mt-2 lg:mt-4 rounded ${color}`} />
-    </div>
-  );
-}
-
-/* ===============================
-   USER TASK TABLE
-================================ */
-function UserTaskTable() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({ status: "pending" });
-
-  const getTaskCode = (id) => `#TSK${id.slice(-3).toUpperCase()}`;
-
-  const fetchTasks = async () => {
-    try {
-      const res = await api.get("/tasks/my-tasks");
-      setTasks(res.data.data || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
-  const handleUpdate = async () => {
-    try {
-      await api.put(`/tasks/${selectedTask._id}`, { status: editData.status });
-      setIsEditing(false);
-      setSelectedTask(null);
-      fetchTasks();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update task");
-    }
-  };
-
-  if (loading) return <p className="p-4">Loading tasks...</p>;
-
-  return (
-    <div className="flex gap-6">
-      {/* TASK TABLE */}
-      <div className="flex-1 bg-white rounded-xl shadow overflow-x-auto">
-        <table className="w-full text-sm min-w-[70vw]">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="hidden lg:inline lg:p-3 text-left">Task ID</th>
-              <th className="lg:p-3 text-left">Title</th>
-              <th className="lg:p-3 text-center">Assigned By</th>
-              <th className="lg:p-3 text-center">Status</th>
-              <th className="lg:p-3 text-center">Created On</th>
-              <th className="lg:p-3 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="p-6 text-center text-gray-500">
-                  No tasks found
-                </td>
-              </tr>
-            ) : (
-              tasks.map((task) => (
-                <tr key={task._id} className="border-b hover:bg-gray-50">
-                  <td className="hidden lg:inline lg:p-3 font-semibold">
-                    {getTaskCode(task._id)}
-                  </td>
-                  <td className="p-3">{task.title}</td>
-                  <td className="p-3 text-center">
-                    {task.createdBy?.fullName || "-"}
-                  </td>
-                  <td className="p-3 text-center capitalize">{task.status}</td>
-                  <td className="p-3 text-center">
-                    {new Date(task.createdAt).toLocaleDateString("en-IN")}
-                  </td>
-                  <td className="p-3 text-center">
-                    <button
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setIsEditing(true);
-                        setEditData({ status: task.status });
-                      }}
-                      className="px-3 py-1 bg-indigo-600 text-white rounded"
-                    >
-                      Edit
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* EDIT PANEL */}
-      {selectedTask && isEditing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          {/* Modal Card */}
-          <div className="relative w-[360px] bg-white rounded-xl shadow-lg p-4 animate-fadeIn">
-            <button
-              onClick={() => {
-                setSelectedTask(null);
-                setIsEditing(false);
-              }}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-lg font-bold"
-            >
-              ✕
-            </button>
-
-            <h3 className="mb-2 flex gap-1">
-              <span className="font-semibold">Title:</span>
-              <span>{selectedTask.title}</span>
-            </h3>
-
-            <p className="text-sm text-gray-600 mb-3">
-              {selectedTask.description || "No description"}
-            </p>
-
-            <label className="block mb-2 font-semibold">Update Status</label>
-            <select
-              className="w-full border p-2 rounded mb-3"
-              value={editData.status}
-              onChange={(e) =>
-                setEditData({ ...editData, status: e.target.value })
-              }
-            >
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-            </select>
-
-            <button
-              onClick={handleUpdate}
-              className="w-full bg-green-600 text-white py-2 rounded"
-            >
-              Save Status
-            </button>
-
-            <button
-              onClick={() => {
-                setIsEditing(false);
-                setSelectedTask(null);
-              }}
-              className="w-full border py-2 rounded mt-2"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+    <div className="bg-white p-5 rounded-xl shadow">
+      <p className="text-gray-500 text-sm">{title}</p>
+      <h2 className="text-2xl font-bold">{value}</h2>
+      <div className={`h-2 mt-3 rounded ${color}`} />
     </div>
   );
 }
